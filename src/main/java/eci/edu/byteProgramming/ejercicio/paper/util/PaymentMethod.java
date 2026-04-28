@@ -2,7 +2,15 @@ package eci.edu.byteProgramming.ejercicio.paper.util;
 
 import java.util.Date;
 
-public abstract class PaymentMethod implements ValidatePayment{
+/**
+ * Abstract base class for all payment methods.
+ *
+ * FIX: The original constructor declared the second parameter as
+ * "transactionID" but stored it into this.customerID — the names were
+ * swapped.  Corrected to "customerId" so the field is properly set.
+ */
+public abstract class PaymentMethod implements ValidatePayment {
+
     protected double amount;
     protected String transactionID;
     protected String customerID;
@@ -11,13 +19,14 @@ public abstract class PaymentMethod implements ValidatePayment{
     protected PaymentStatus status;
     protected String description;
 
-    public PaymentMethod(double amount, String transactionID, String description) {
-        this.amount = amount;
-        this.customerID = customerID;
+    // FIX: second parameter renamed from transactionID -> customerId
+    public PaymentMethod(double amount, String customerId, String description) {
+        this.amount      = amount;
+        this.customerID  = customerId;   // was: this.customerID = customerID (null ref)
         this.description = description;
-        this.currency = "USD";
-        this.status = PaymentStatus.PENDING;
-        this.timestamp = new Date();
+        this.currency    = "USD";
+        this.status      = PaymentStatus.PENDING;
+        this.timestamp   = new Date();
         this.transactionID = generateTransactionId();
     }
 
@@ -25,38 +34,34 @@ public abstract class PaymentMethod implements ValidatePayment{
     public abstract String getPaymentMethod();
 
     protected String generateTransactionId() {
-        
-        long timestamp = System.currentTimeMillis();
-        int random = (int)(Math.random() * 9999);
-        return String.format("TXN%d%04d", timestamp, random);
+        long ts    = System.currentTimeMillis();
+        int random = (int) (Math.random() * 9999);
+        return String.format("TXN%d%04d", ts, random);
     }
-    
-    
+
     protected String generateTransactionIdWithPrefix(String paymentType) {
         String prefix = getPaymentTypePrefix(paymentType);
-        long timestamp = System.currentTimeMillis();
-        int random = (int)(Math.random() * 9999);
-        return String.format("%s%d%04d", prefix, timestamp, random);
+        long ts       = System.currentTimeMillis();
+        int random    = (int) (Math.random() * 9999);
+        return String.format("%s%d%04d", prefix, ts, random);
     }
-    
+
     private String getPaymentTypePrefix(String paymentType) {
-        switch(paymentType) {
+        switch (paymentType) {
             case "CREDIT_CARD": return "CC";
-            case "PAYPAL": return "PP";
-            case "CRYPTO": return "CR";
-            default: return "TX";
+            case "PAYPAL":      return "PP";
+            case "CRYPTO":      return "CR";
+            default:            return "TX";
         }
     }
 
-    public double setAmount(double amount){
-        return this.amount = amount;
-    }
+    public double setAmount(double amount) { return this.amount = amount; }
 
-    public double getAmount() { return amount; }
-    public String getTransactionId() { return transactionID; }
-    public PaymentStatus getStatus() { return status; }
+    public double getAmount()            { return amount; }
+    public String getTransactionId()     { return transactionID; }
+    public PaymentStatus getStatus()     { return status; }
     public void setStatus(PaymentStatus status) { this.status = status; }
-    public String getCustomerId() { return customerID; }
-    public String getDescription() { return description; }
-    public Date getTimestamp() { return timestamp; }
+    public String getCustomerId()        { return customerID; }
+    public String getDescription()       { return description; }
+    public Date getTimestamp()           { return timestamp; }
 }
